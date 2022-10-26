@@ -101,9 +101,15 @@ t1 = threading.Thread(target=mqtt_client.loop_forever)
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-@app.route('/')
+@app.route('/', methods = ['GET', 'POST'])
 def index():
-    return
+    if request.method == 'POST':
+        msg = request.get_json()
+        print(msg)
+
+        return Response('ok', status = 200)
+    else:
+        return "<h1>Welcome!</h1>"
 
 #Connessione a flask
 myip = '127.0.0.1'
