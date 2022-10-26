@@ -95,8 +95,20 @@ mqtt_client.connect(broker_ip, broker_port)
 
 t1 = threading.Thread(target=mqtt_client.loop_forever)
 
+#---------------------------- PARTE FLASK --------------------------------
+
+# Inizializzazione Flask
+app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+
+
+#Connessione a flask
+myip = '127.0.0.1'
+t2 = threading.Thread(target=app.run, kwargs={'host': myip})
+
 if __name__ == '__main__':
     t1.start()
-    #t2.start()
+    t2.start()
     t1.join()
-    #t2.join()
+    t2.join()
