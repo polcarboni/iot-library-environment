@@ -15,7 +15,7 @@ import json
 #---------------------------- PARTE FLASK --------------------------------
 
 # Inizializzazione Flask
-TOKEN = "5657535367:AAG9fp0SBQcdM3mreL6sTs5jxF1kDoBKv-o"
+TOKEN = "" #Inserire qui bot di telegram
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
