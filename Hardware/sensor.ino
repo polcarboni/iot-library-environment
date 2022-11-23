@@ -155,12 +155,16 @@ void loop() {
     sound_lev = abs(noise_level - 256);
 
     //Serial.println(sound_lev);
+    
 
-    if (sound_lev  < 30) sound_lev_0 ++;
-    else if (sound_lev >= 30 && sound_lev < 60) sound_lev_1 ++;
-    else if (sound_lev >= 60 && sound_lev < 100) sound_lev_2 ++;
-    else if (sound_lev >= 100) sound_lev_3 ++;
+    if (sound_lev < 25) sound_lev_0 ++;
+    else if (sound_lev >= 25 && sound_lev < 60 && in_pressed == 0 && out_pressed == 0) sound_lev_1 ++;
+    else if (sound_lev >= 60 && sound_lev < 100 && in_pressed == 0 && out_pressed == 0) sound_lev_2 ++;   //bug sulla pressione del pulsante di ingresso
+    else if (sound_lev >= 100 && in_pressed == 0 && out_pressed == 0) sound_lev_3 ++;   //bug sulla pressione del pulsante di ingresso
+    
+    
     sound_time = millis();
+
    }
 
 
@@ -182,8 +186,6 @@ void loop() {
     String output = hum_string + " %,  " + temp_string + "°C,  posti: " + counted_string + ",  Sounds: "
                       + lev0 + " " + lev1 + " " + lev2 + " " + " " + lev3;
     Serial.println(output);
-    
-    //CONVERSIONE DEI VALORI DI SUONO
     
       counted = 0;
       sound_lev_0 = 0;
