@@ -3,7 +3,9 @@ import serial.tools.list_ports
 
 import paho.mqtt.client as mqtt
 
+
 class Bridge():
+    
     def setupSerial(self):
         self.ser = None
         print("Porte disponibili: ")
@@ -56,17 +58,17 @@ class Bridge():
         while (True):
             if not self.ser is None:
 
-                if self.ser.in_waiting > 0
+                if self.ser.in_waiting > 0:
                 # Dati disponibili dalla porta seriale
 
-                lastchar = self.ser.read(1)
+                    lastchar = self.ser.read(1)
 
-                if lastchar == b'\xfe': #EOL
-                    print("\nRicevuto")
-                    self.useData()
-                    self.inBuffer = []
-                else:
-                    self.inbuffer.append_(lastchar)
+                    if lastchar == b'\xfe': #EOL
+                        print("\nRicevuto")
+                        self.useData()
+                        self.inBuffer = []
+                    else:
+                        self.inbuffer.append_(lastchar)
 
     def useData(self):  #Operazioni da eseguire quando si ricevono dati
         
@@ -84,4 +86,10 @@ class Bridge():
             strval = "Sensor %d:  %d" %(i, val)
             print(strval)
             self.clientMQTT.publish('sensor/{:d}'.format(i), '{:d}'.format(val))
-    
+
+def main():
+    bridge = Bridge()
+    bridge.setup()
+
+if __name__ == "__main__":
+    main()

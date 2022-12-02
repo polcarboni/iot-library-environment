@@ -183,10 +183,11 @@ void loop() {
     String lev3 = String(sound_lev_3);
     
 
-    String output = hum_string + " %,  " + temp_string + "°C,  posti: " + counted_string + ",  Sounds: "
+    String output = hum_string + " %,  " + temp_string + "C,  posti: " + counted_string + ",  Sounds: "
                       + lev0 + " " + lev1 + " " + lev2 + " " + " " + lev3;
   
-      
+    Serial.println(output);
+
       counted = 0;
       sound_lev_0 = 0;
       sound_lev_1 = 0;
