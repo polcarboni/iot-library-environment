@@ -39,7 +39,6 @@ class Bridge():
         pass
 
     def loop(self):
-        while(True):
             str = ""
             if not self.ser is None:
                 if self.ser.in_waiting > 0:
@@ -50,19 +49,28 @@ class Bridge():
                         readvals = re.split(',', str.join(self.inbuffer))
                         self.vals = list(map(int, readvals))
                         print(self.vals)
+                        self.useData()
                         self.inbuffer = []
 
 
                     else:
                         dec = lastchar.decode(self.encoding)
                         self.inbuffer.append(dec)
+    
+    def useData(self):
+        pass
+    
+    def setup(self):
+        print("Setting up serial comm...")
+        self.setupSerial()
+        
                         
                     
-                        
+'''                        
 def main():
     bridge = Bridge()
-    bridge.setupSerial()
-    bridge.loop()
+    bridge.setup()
 
 if __name__ == "__main__":
     main()
+'''
