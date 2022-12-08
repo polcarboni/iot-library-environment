@@ -48,17 +48,16 @@ class Bridge():
                     if lastchar == b'x':
                         readvals = re.split(',', str.join(self.inbuffer))
                         self.vals = list(map(int, readvals))
-                        print(self.vals)
-                        self.useData()
+                        
+                        
                         self.inbuffer = []
+                        return(self.vals)
 
 
                     else:
                         dec = lastchar.decode(self.encoding)
                         self.inbuffer.append(dec)
-    
-    def useData(self):
-        pass
+
     
     def setup(self):
         print("Setting up serial comm...")

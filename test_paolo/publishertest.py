@@ -1,17 +1,26 @@
-import serial
-import serial.tools.list_ports
+from atexit import register
 import paho.mqtt.client as mqtt
-import threading
+import threading, time, json
 
 from bridgetest import Bridge
 
-def on_connect(client, userdata,flags, rc):
-    print("Connesso con result code: " + str(rc))
-    client.subscribe("$SYS/#")
+class Client():
 
-def on_message(client, userdata, msg):
-    pass
-    #print(msg.topic + " " + str(msg.payload))
+    def on_connect(client, userdata,flags, rc):
+        print("Connesso con result code: " + str(rc))
+
+    def register(client):
+        client.publish("biblioteche/dief/piano_0/registra")
+
+    def entrata(client):
+        client.publish("biblioteche/dief/piano_0/entrata")
+
+    def uscita(client):
+        client.publish("biblioteche/dief/piano_0/uscita")
+
+    def loop():
+        pass
+    
 
 
 def main():
@@ -29,7 +38,4 @@ def main():
     my_client.connect("mqtt.eclipseprojects.io", 1883, 60)
 
 
-
-if __name__ == "__main__":
-    main()
 

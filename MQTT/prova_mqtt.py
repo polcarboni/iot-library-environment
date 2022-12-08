@@ -42,6 +42,8 @@ def main():
     disponibili = 0
     while True:
         media, n = read_data(media, n)
+
+        # Simulazione ingressi/uscite.
         p = random.randint(0, 100)
         if i==5:
             register(media)
