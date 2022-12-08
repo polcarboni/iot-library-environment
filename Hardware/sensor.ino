@@ -175,7 +175,7 @@ void loop() {
     dht22.read2(&temp, &hum, NULL);
 
     String hum_string = String(int(hum));
-    String temp_string = String(("%.2f", temp));
+    String temp_string = String(int(temp));
     String counted_string = String(-counted);
     String lev0 = String(sound_lev_0);
     String lev1 = String(sound_lev_1);
@@ -183,9 +183,9 @@ void loop() {
     String lev3 = String(sound_lev_3);
     
 
-    String output = hum_string + temp_string + counted_string + lev0 + lev1 + lev2 + lev3 + "x";
+    String output = hum_string +","+ temp_string + ","+counted_string + ","+lev0 + ","+lev1 + ","+lev2 + ","+lev3 + "x";
   
-    Serial.println(output);
+    Serial.print(output);
 
       counted = 0;
       sound_lev_0 = 0;

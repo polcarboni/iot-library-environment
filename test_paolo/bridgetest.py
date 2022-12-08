@@ -1,11 +1,13 @@
 import serial
 import serial.tools.list_ports
 import paho.mqtt.client as mqtt
+import re
 
 class Bridge():
 
     def setupSerial(self):
 
+        self.vals = []
         self.encoding = 'utf-8'
         self.ser = None
         self.portname = None
@@ -42,13 +44,15 @@ class Bridge():
             if not self.ser is None:
                 if self.ser.in_waiting > 0:
                     lastchar = self.ser.read(1)
-                
-                    
 
-                    if lastchar == b'x':
-                        print(str.join(self.inbuffer))
-                        self.inbuffer = []
                     
+                    if lastchar == b'x':
+                        readvals = re.split(',', str.join(self.inbuffer))
+                        self.vals = list(map(int, readvals))
+                        print(self.vals)
+                        self.inbuffer = []
+
+
                     else:
                         dec = lastchar.decode(self.encoding)
                         self.inbuffer.append(dec)
