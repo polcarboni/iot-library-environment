@@ -10,6 +10,7 @@ def on_message(client, userdata, message):
     #p_id = message.topic.split('/')[2]
     #print(f"NEW MESSAGE on {message.topic} -- {p_id}")
     if mqtt.topic_matches_sub(topic_dati, message.topic):
+        
         data = json.loads(message.payload.decode("utf-8"))
         print('ricevuto: ', data)
     
