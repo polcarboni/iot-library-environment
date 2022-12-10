@@ -2,17 +2,47 @@ from atexit import register
 import paho.mqtt.client as mqtt
 import threading, time, json
 import random
+import time
 
 from bridgetest import Bridge
 from publishertest import Client
 
+'''
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code " + str(rc))
+    
+def register(media):
+    my_client.publish('biblioteche/dief/piano_0/registra', json.dumps(media))
+    return
+
+def entrata():
+    my_client.publish('biblioteche/dief/piano_0/entrata')
+
+def uscita():
+    my_client.publish('biblioteche/dief/piano_0/uscita')
+
+def dataWork(values):
+    pass
+'''
+
     
 def main():
+    check = 0
+
+    noise_0 = 0
+    noise_1 = 0
+    noise_2 = 0
+    noise_3 = 0
+    
+    temp = []
+    hum = []
+
     broker_ip = "127.0.0.1"
     broker_port = 1883
 
     my_bridge = Bridge()
     my_bridge.setup()
+    my_bridge.vals = [0, 0, 0, 0, 0, 0, 0, 0]
 
     '''
     my_client = Client()
@@ -22,20 +52,44 @@ def main():
     '''
 
     while True:
-        '''
-        t1 = threading.Thread(target = my_bridge.loop())
-        t2 = threading.Thread(target = my_client.loop())
-
-        t1.start()
-        t2.start()
-        t1.join()
-        t2.join()
-        '''
+    
         my_bridge.loop()
+        
+        if my_bridge.vals[7] != check:  #Arrivo di nuovi dati
 
-        if (my_bridge.inbuffer == []):
             print(my_bridge.vals)
 
+            if (my_bridge.vals[2] > 0):
+                #uscita()
+                print("USCITA")
+                pass
+            
+            elif (my_bridge.vals[2] < 0):
+                #entrata()
+                print("ENTRATA")
+                pass
+            
+            noise_0 = noise_0 + my_bridge.vals[3]
+            noise_1 = noise_1 + my_bridge.vals[4]
+            noise_2 = noise_2 + my_bridge.vals[5]
+            noise_3 = noise_3 + my_bridge.vals[6]
 
+            hum.append(my_bridge.vals[0])
+            temp.append(my_bridge.vals[1])
+        
+            if my_bridge.vals[7] % 10 == 0:
+                print("Caccia su")
+                print("t: ",temp,"h: ",hum, noise_0, noise_1, noise_2, noise_3)
+                temp = []
+                hum = []
+                noise_0 = 0 
+                noise_1 = 0
+                noise_2 = 0
+                noise_3 = 0
+                
+        
+        check = my_bridge.vals[7]
+
+        
 if __name__ == "__main__":
     main()

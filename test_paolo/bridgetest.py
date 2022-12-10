@@ -42,6 +42,7 @@ class Bridge():
             str = ""
             if not self.ser is None:
                 if self.ser.in_waiting > 0:
+                    
                     lastchar = self.ser.read(1)
 
                     
@@ -49,7 +50,7 @@ class Bridge():
                         readvals = re.split(',', str.join(self.inbuffer))
                         self.vals = list(map(int, readvals))
                         
-                        
+            
                         self.inbuffer = []
                         return(self.vals)
 
