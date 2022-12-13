@@ -87,12 +87,6 @@ t1 = threading.Thread(target=mqtt_client.loop_forever)
 #---------------------------- PARTE FLASK --------------------------------
 
 # Inizializzazione Flask
-app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
-
-#---------------------------- PARTE FLASK --------------------------------
-
-# Inizializzazione Flask
 TOKEN = "5657535367:AAG9fp0SBQcdM3mreL6sTs5jxF1kDoBKv-o" #Inserire qui bot di telegram
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
