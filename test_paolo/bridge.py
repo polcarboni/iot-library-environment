@@ -7,7 +7,7 @@ class Bridge():
 
     def setupSerial(self):
 
-        self.vals = []
+        self.vals = [0,0,0,0,0,0,0,0]
         self.encoding = 'utf-8'
         self.ser = None
         self.portname = None
@@ -29,15 +29,6 @@ class Bridge():
         except:
             self.ser = None        
 
-    def setupMQTT(self):
-        pass
-
-    def on_connect(self):
-        pass
-
-    def on_message(self, client, userdata, msg):
-        pass
-
     def loop(self):
             str = ""
             if not self.ser is None:
@@ -48,7 +39,9 @@ class Bridge():
                     
                     if lastchar == b'x':
                         readvals = re.split(',', str.join(self.inbuffer))
-                        self.vals = list(map(int, readvals))
+                        self.vals[:2] = map(float, readvals[:2])
+                        self.vals[2:] = map(int, readvals[2:])
+                        #print(readvals)
                         
             
                         self.inbuffer = []
@@ -63,14 +56,3 @@ class Bridge():
     def setup(self):
         print("Setting up serial comm...")
         self.setupSerial()
-        
-                        
-                    
-'''                        
-def main():
-    bridge = Bridge()
-    bridge.setup()
-
-if __name__ == "__main__":
-    main()
-'''

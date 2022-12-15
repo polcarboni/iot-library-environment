@@ -5,8 +5,7 @@ import random
 import time
 from statistics import mean
 
-from bridgetest import Bridge
-#from publishertest import Client
+from bridge import Bridge
 
 
 def on_connect(client, userdata, flags, rc):
@@ -85,7 +84,7 @@ def main():
 
                # datawork(temp, hum, noise_0, noise_1, noise_2, noise_3)
 
-                
+
                 
                 t = mean(temp)
                 h = mean (hum)

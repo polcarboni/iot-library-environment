@@ -1,6 +1,6 @@
 #include <SimpleDHT.h>
 
-#define COMMUNICATION_TIME 5000
+#define COMMUNICATION_TIME 2000
 #define SOUND_TIME 25  
 
 #define OUT_PIN 2
@@ -16,6 +16,7 @@ int out_pressed;
 unsigned long int cur_time;
 unsigned long int humtemp_time;
 unsigned long int sound_time;
+unsigned long int progressivo;
 
 int noise_level;
 int sound_lev;
@@ -36,6 +37,7 @@ int out_flag;
 void setup() {
   
   cur_time = 0;
+  progressivo = 0;
   
   
   people_count = 0;
@@ -174,8 +176,8 @@ void loop() {
     
     dht22.read2(&temp, &hum, NULL);
 
-    String hum_string = String(int(hum));
-    String temp_string = String(int(temp));
+    String hum_string = String(hum);
+    String temp_string = String(temp);
     String counted_string = String(-counted);
     String lev0 = String(sound_lev_0);
     String lev1 = String(sound_lev_1);
@@ -183,7 +185,7 @@ void loop() {
     String lev3 = String(sound_lev_3);
     
 
-    String output = hum_string +","+ temp_string + ","+counted_string + ","+lev0 + ","+lev1 + ","+lev2 + ","+lev3 + "x";
+    String output = hum_string +","+ temp_string + ","+counted_string + ","+lev0 + ","+lev1 + ","+lev2 + ","+lev3 +","+progressivo+ "x";
   
     Serial.print(output);
 
@@ -192,6 +194,8 @@ void loop() {
       sound_lev_1 = 0;
       sound_lev_2 = 0;
       sound_lev_3 = 0;
+
+      progressivo++;
   
     cur_time = millis();
   }
