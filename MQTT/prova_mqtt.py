@@ -12,9 +12,11 @@ def register(media):
     return
 
 def entrata():
+    print("ENTRATA")
     mqtt_client.publish('biblioteche/dief/piano_0/entrata')
 
 def uscita():
+    print("USCITA")
     mqtt_client.publish('biblioteche/dief/piano_0/uscita')
 
 def read_data(media, n):
