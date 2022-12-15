@@ -13,6 +13,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     
 def register(value_dict):
+    print("register")
     my_client.publish('biblioteche/dief/piano_0/registra', json.dumps(value_dict))
     return
 
@@ -94,8 +95,7 @@ def main():
 
                 media = {'temperatura': t,'umidita': h, 'overall_ambiente': env, 'decibel': noise}
                 print("t: ",temp,"h: ",hum, noise_0, noise_1, noise_2, noise_3)
-                print("Caccia su")
-                print(media)
+                register(media)
 
 
                 temp = []

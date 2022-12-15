@@ -53,7 +53,7 @@ def on_message(client, userdata, message):
                             'overal_ambiente': message_payload['overall_ambiente'],
                             'decibel': message_payload['decibel'],
                             'date': datetime.datetime.today(),
-                            'place': 2,
+                            'place': 25,
                             'max_place': 25,
                             'avaible': True}
         else:
