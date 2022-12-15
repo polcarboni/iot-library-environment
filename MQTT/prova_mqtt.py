@@ -31,12 +31,13 @@ def read_data(media, n):
     media['temperatura'] = (media['temperatura']+dati['t'])/n
     media['umidita'] = (media['umidita']+dati['h'])/n
     media['decibel'] = (media['decibel']+dati['d'])/n
+    media['overall_ambiente'] = random.randint(0, 3)
 
     return media, n
 
 
 def main():
-    media = {'temperatura': 0,'umidita': 0,'decibel': 0}
+    media = {'temperatura': 0,'umidita': 0,'overall_ambiente': 0,'decibel': 0}
     n = 0
     i = 0
     disponibili = 0
@@ -49,9 +50,11 @@ def main():
         i += 1
         if p>50:
             if p > 75:
+                print("persona in entrata")
                 entrata()
                 disponibili = disponibili + 1
-            elif p < 75 and disponibili > 0:
+            else:
+                print("Persona in uscita")
                 uscita()
                 disponibili = disponibili - 1
         time.sleep(3)

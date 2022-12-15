@@ -22,7 +22,7 @@ db_biblioteche = db.Biblioteche
 #topic
 registra = 'biblioteche/+/+/registra'
 entrata = 'biblioteche/+/+/entrata'
-uscita = 'biblioteca/+/+/uscita'
+uscita = 'biblioteche/+/+/uscita'
 
 #Connessione ad MQTT
 def on_connect(client, userdata, flags, rc):
@@ -41,35 +41,74 @@ def on_message(client, userdata, message):
     if mqtt.topic_matches_sub(registra, message.topic):
         print('nuovo messaggio su topic registra')
         message_payload = json.loads(str(message.payload.decode("utf-8")))
-        registrati = {'biblioteca': "giuridica", 'stanza': stanza,
-                        'temperature': message_payload['temperatura'],
-                        'humidity': message_payload['umidita'],
-                        'decibel': message_payload['decibel'],
-                        'date': datetime.datetime.today(),
-                        'place': 25,
-                        'max_place': 25,
-                        'available': True}
+        result = None
+        biblioteca = message.topic.split('/')[1]
+        stanza = message.topic.split('/')[2]
+        query = {"biblioteca": {"$regex": "dief"}, "stanza": {"$regex": "piano_0"}}
+        result = db_biblioteche.find_one(query, {"date": 1, "place": 1, 'avaible': 1}, sort=[("_id", pymongo.DESCENDING)])
+        if result is None:
+            registrati = {'biblioteca': biblioteca, 'stanza': stanza,
+                            'temperature': message_payload['temperatura'],
+                            'humidity': message_payload['umidita'],
+                            'overal_ambiente': message_payload['overall_ambiente'],
+                            'decibel': message_payload['decibel'],
+                            'date': datetime.datetime.today(),
+                            'place': 2,
+                            'max_place': 25,
+                            'avaible': True}
+        else:
+            registrati = {'biblioteca': biblioteca, 'stanza': stanza,
+                            'temperature': message_payload['temperatura'],
+                            'humidity': message_payload['umidita'],
+                            'overal_ambiente': message_payload['overall_ambiente'],
+                            'decibel': message_payload['decibel'],
+                            'date': datetime.datetime.today(),
+                            'place': result['place'],
+                            'max_place': 25,
+                            'avaible': result['avaible']}
         print("I dati appena ricevuti sono:")
         print(registrati)
         db_biblioteche.insert_one(registrati)
     
     #Entrata di una persona e modifica dei posti
     if mqtt.topic_matches_sub(entrata, message.topic):
-        print("Persona in entrata")
+        result = None
+        biblioteca = message.topic.split('/')[1]
+        stanza = message.topic.split('/')[2]
         query = {"biblioteca": {"$regex": "dief"}, "stanza": {"$regex": "piano_0"}}
-        result = db_biblioteche.find_one(query, {"date": 1, "place": 1}, sort=[("_id", pymongo.DESCENDING)])
-        n = result['place'] - 1
-        value = {"$set": {"place": n}}
-        result = db_biblioteche.update_one({'_id': result['_id']}, value)   
+        result = db_biblioteche.find_one(query, {"date": 1, "place": 1, 'avaible': 1}, sort=[("_id", pymongo.DESCENDING)])
+        if result is not None:
+            id = result['_id']
+            if result['avaible'] is True:
+                print("Persona in entrata")
+                n = result['place'] - 1
+                value = {"$set": {"place": n}}
+                result = db_biblioteche.update_one({'_id': id}, value)
+                if(n==0):
+                    avaible = {"$set": {"avaible": False}}
+                    result = db_biblioteche.update_one({'_id': id}, avaible)
+            else:
+                print("La biblioteca è piena")
+        else:
+            print("Non ci sono corrispondenze")
 
     #Uscita di una persona
     if mqtt.topic_matches_sub(uscita, message.topic):
+        result = None
+        biblioteca = message.topic.split('/')[1]
+        stanza = message.topic.split('/')[2]
         print("Persona in uscita")
         query = {"biblioteca": {"$regex": "dief"}, "stanza": {"$regex": "piano_0"}}
-        result = db_biblioteche.find_one(query, {"date": 1, "place": 1}, sort=[("_id", pymongo.DESCENDING)])
-        n = result['place'] + 1
-        value = {"$set": {"place": n}}
-        result = db_biblioteche.update_one({'_id': result['_id']}, value)
+        result = db_biblioteche.find_one(query, {"date": 1, "place": 1, 'avaible': 1, 'max_place': 1}, sort=[("_id", pymongo.DESCENDING)])
+        if result is not None and result['place'] < result['max_place']:
+            id = result['_id']
+            n = result['place'] + 1
+            value = {"$set": {"place": n}}
+            result = db_biblioteche.update_one({'_id': id}, value)
+            avaible = {"$set": {"avaible": True}}
+            result = db_biblioteche.update_one({'_id': id}, avaible)
+        else:
+            print("Non ci sono corrispondenze")
 
 
 mqtt_client = mqtt.Client('my_id')
@@ -132,20 +171,41 @@ def opzioni(chat_id, biblioteca):
 # Funzione per restituire le info di una biblioteca all'ora in cui si cerca
 def info(chat_id, biblioteca):
     query = {"biblioteca": {"$regex": biblioteca}, "stanza": {"$regex": "piano_0"}}
-    result = db_biblioteche.find_one(query, {"_id":0, "temperature": 1, "humidity": 1, "decibel": 1, "place": 1, "avaible": 1}, sort=[("_id", pymongo.DESCENDING)])
+    result = db_biblioteche.find_one(query, {"_id":0, "temperature": 1, "humidity": 1, "decibel": 1, "place": 1}, sort=[("_id", pymongo.DESCENDING)])
     print(result)
     output = ""
+    emoji = ["\U0001F534", "\U0001F534", "\U0001F7E1", "\U0001F7E1"] #Temp, Hum, Dec, Place
+    i = 0
     for key, value in result.items():
-        output+= "\n"+ str(key) + ": " + str(value)
+        output+= "\n"+ str(key) + ": " + str(value) + emoji[i]
+        i = i + 1
 
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
     payload = {
         'chat_id': chat_id,
         'text': output
     }
+    r = requests.post(url, json=payload)
+    return r
+
+# Funzione per restituire la posizione della biblioteca
+def posizione(chat_id, biblioteca):
+    if(biblioteca == "dief"):
+        latitude = 44.62984133830825
+        longitude = 10.948883630690565
+    elif(biblioteca == "giuridica"):
+        latitude = 44.64341411635343
+        longitude = 10.925336714475163
+    url = f'https://api.telegram.org/bot{TOKEN}/sendLocation'
+    payload = {
+        'chat_id': chat_id,
+        'latitude': latitude,
+        'longitude': longitude
+    }
 
     r = requests.post(url, json=payload)
-    return r 
+    return r
+
 
 @app.route('/', methods = ['GET', 'POST'])
 def index():
@@ -155,13 +215,17 @@ def index():
 
         chat_id, txt = parse_message(msg)
         if txt == "/start":
-            lista_biblioteche(chat_id, biblioteche)
+            r = lista_biblioteche(chat_id, biblioteche)
         elif txt[1:] in biblioteche:
             r = opzioni(chat_id, txt[1:])
         elif txt[:5] == "/Info":
-            info(chat_id, txt[6:])
+            r = info(chat_id, txt[6:])
+            r = opzioni(chat_id, txt[6:])
+        elif txt[:10] == "/Posizione":
+            r = posizione(chat_id, txt[11:])
+            r = opzioni(chat_id, txt[11:])
 
-        return Response('ok', status= 200)
+    return Response('ok', status= 200)
 
 #Connessione a flask
 myip = '127.0.0.1'
