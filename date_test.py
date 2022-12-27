@@ -7,12 +7,14 @@ delta = datetime.timedelta(0, sample_time)
 date = datetime.datetime(2022, 6, 13, 9, 30, 0)
 
 #Stanze biblioteche
-rooms=['ingresso', 'r1', 'r2', 'r3']
-dief_rooms =['ingresso', 'l0', 'l1', 'acquario']
+rooms=['ingresso', 'bra1', 'bra2', 'bra3']
+dief_rooms =['ingresso', 'lev0', 'lev1', 'acquario']
+bsi_rooms = ['ingresso', '0floor', '1floor', '100posti']
 
 #Definizione e parametri biblioteche
 Giuri = Library("Giuridica", rooms, 10, 18, 40, 200)
-dief = Library("DIEF", dief_rooms, 300, 20, 60, 300, 8, 18)
+dief = Library("DIEF", dief_rooms, 15, 20, 60, 200, 8, 18)
+BSI = Library("BSI", bsi_rooms, 0, 22, 40, 200, 10, 23)
 
 
 while True: #AGGIUNGERE CONDIZIONE DI STOP (data fine registrazioni)

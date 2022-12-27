@@ -9,11 +9,14 @@ m = 1
 
 class Room():
 
-    def __init__(self, name):
+    def __init__(self, name, places, max_places, temp, hum):
 
         self.name = name
         self.output= [0,0,0,0,0,0,0,0]
         self.places = places
+        self.max_places = max_places
+        self.temp = temp
+        self.hum = hum
         self.noise_variance = random.uniform(0.25, 0.35)
 
     def __str__(self):
@@ -47,13 +50,14 @@ class Room():
 
         t = random.gauss(0,0.3)
         h = random.uniform(0,100)
-        if t > 0.9:
-            self.temp = self.temp + 0.1
 
-        if t < -0.9:
-            self.temp = self.temp - 0.1
+        if t > 0.8:
+            self.temp = round(self.temp + 0.1, 1)
+
+        if t < -0.8:
+            self.temp = round(self.temp - 0.1, 1)
 
         if h>80:
-            self.hum = self.hum + round(random.uniform(-0.5, 0.5),2)
+            self.hum = round(self.hum + random.uniform(-0.5, 0.5),1)
 
         return temp, hum
