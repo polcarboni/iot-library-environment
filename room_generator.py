@@ -13,7 +13,7 @@ class Room():
 
         self.name = name
         self.output= [0,0,0,0,0,0,0,0]
-        self.places = places
+        self.occ_places = places
         self.max_places = max_places
         self.temp = temp
         self.hum = hum
@@ -25,7 +25,7 @@ class Room():
     
     def noise(self, h, m):
         
-        perc = places/max_places
+        perc = self.occ_places/self.max_places
 
         n0 = 0
         n1 = 0
