@@ -2,20 +2,27 @@ import random
 import time
 import datetime
 from temp_hum_score import temp_hum_score
+from room_generator import Room
 
 
 class Library():
 
-    def __init__(self, name, places, max_places = 100, opening = 9, closing = 20):
+    def __init__(self, name, floornames, places, avg_temp, avg_hum, max_places = 100, opening = 9, closing = 20):
         #temp, hum, entrance, s0, s1, s2, s3, progr
         self.name = name
+        self.floornames = floornames
         self.output = [0,0,0,0,0,0,0,5]
         self.max_places = max_places
         self.places = places
         self.opening = opening
         self.closing = closing
+        self.avg_temp = avg_temp
+        self.avg_hum = avg_hum
+        self.floors = {}
 
-        
+        for i in range(len(self.floornames)):
+            self.floors[self.floornames[i]]= Room(self.floornames[i])
+            
 
     def __str__(self):
         print(self.name + " (Max places: " + str(self.places),", Open: "  + str(self.opening) + ":00, ", "Closes : " + str(self.closing)+ ":00)")
@@ -43,35 +50,6 @@ class Library():
                     
         return entrance 
 
-    def noise(self, h, m):
-        
-        perc = self.places/self.max_places
-
-        n0 = 0
-        n1 = 0
-        n2 = 0
-        n3 = 0
-        sigma = random.uniform(0.25, 0.35)
-
-        for i in range(1000):
-            r = random.gauss(perc - 1, sigma)
-
-            if r < -0.4:
-                n0 = n0 + 1
-            elif r > -0.4 and r < 0.4:
-                n1 = n1 + 1
-            elif r > 0.41 and r < 0.75:
-                n2 = n2 + 1
-            elif r > 0.85:
-                n3 = n3 + 1
-            
-        return n0, n1, n2, n3
-
-    def temp_hum(self, h, m):
-        hum = 42
-        temp = 54
-
-        return temp, hum
         
     def generate_value(self, h, m):
 
@@ -90,7 +68,35 @@ class Library():
         print(self.name, self.output, "Posti disponibili: ", self.max_places-self.places)
         #Agginugi data orario, mattinapome + giorno settimana
     
-    
+    def generate_values(self, h, m):
+        flooroutput = [0,0,0,0,0,0,0,0]
+
+        for i in self.floornames:
+
+            temp = 'temp'
+            hum = 'hum'
+
+            #temp, hum = self.floors[i].temp_hum()
+            n0, n1, n2, n3 = self.floors[i].noise(h,m)
+
+            flooroutput[0]= temp
+            flooroutput[1]= hum
+            
+            if self.floors[i].name == 'ingresso':
+                flooroutput[2] = self.entrance(h,m)
+            else:
+                flooroutput[2] = 0
+
+            flooroutput[3]= n0
+            flooroutput[4]= n1
+            flooroutput[5]= n2
+            flooroutput[6]= n3
+            flooroutput[7]= self.output[7] + 1  
+
+            
+            print(self.name, self.floors[i].name, flooroutput)
+
+            
     
 
 
