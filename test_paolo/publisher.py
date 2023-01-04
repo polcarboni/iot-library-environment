@@ -5,6 +5,7 @@ import random
 import time
 from statistics import mean
 
+import score_functions
 from bridge import Bridge
 
 
@@ -23,24 +24,6 @@ def entrata():
 def uscita():
     print("USCITA")
     my_client.publish('biblioteche/dief/piano_0/uscita')
-
-def env_score(t, h):
-
-    score = 0
-    return score
-
-def noise_score(n0, n1, n2, n3):
-    
-    tot = n0 + n1 + n2 + n3
-    p0 = n0/tot
-    p1 = n1/tot
-    p2 = n2/tot
-    p3 = n3/tot
-
-    score = 10000
-
-    return score
-    
 
 
 def main():
@@ -84,13 +67,11 @@ def main():
 
                # datawork(temp, hum, noise_0, noise_1, noise_2, noise_3)
 
-
-                
                 t = mean(temp)
-                h = mean (hum)
+                h = mean(hum)
 
-                env = env_score(temp, hum)
-                noise = noise_score(noise_0, noise_1, noise_2, noise_3)
+                env = score_functions.temp_hum_score(temp, hum)
+                noise = score_functions.noise_score(noise_0, noise_1, noise_2, noise_3)
 
                 media = {'temperatura': t,'umidita': h, 'overall_ambiente': env, 'decibel': noise}
                 print("t: ",temp,"h: ",hum, noise_0, noise_1, noise_2, noise_3)
