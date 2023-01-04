@@ -14,7 +14,7 @@ dief_rooms =['ingresso', 'lev0', 'lev1', 'acquario']
 bsi_rooms = ['ingresso', '0floor', '1floor', '100posti']
 
 #Definizione e parametri biblioteche
-#Nome, stanza, posti occupati, temp media, hum media, posti max, apertura, chiusura
+#Nome, stanze, temp media, hum media, posti max, apertura, chiusura
 Giuri = Library("Giuridica", giuri_rooms, 18, 40, 200, 8, 0, 20, 0)
 dief = Library("DIEF", dief_rooms, 20, 60, 200, 9, 0, 19, 30)
 BSI = Library("BSI", bsi_rooms, 6, 20, 200, 10, 0, 23, 0)
@@ -30,8 +30,8 @@ while True:
 
 
     Giuri.generate_values(h, m)
-    #dief.generate_values(h,m)
-    #BSI.generate_values(h,m)
+    dief.generate_values(h,m)
+    BSI.generate_values(h,m)
 
     sys.stdout=open(os.devnull, 'w')
 
