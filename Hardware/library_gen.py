@@ -94,6 +94,7 @@ class Library():
         m = int(str(m))
         
         flooroutput = [0,0,0,0,0,0,0,0,0,0]
+        #Aggiungi minuti
         if h >= self.opening and h < self.closing:
 
             print(self.name, ": ", self.max_places - self.occ_places, "  ", self.mu_test)
@@ -112,11 +113,13 @@ class Library():
                 else:
                     flooroutput[2] = 0
 
+                # Sound levels
                 flooroutput[3]= n0
                 flooroutput[4]= n1
                 flooroutput[5]= n2
                 flooroutput[6]= n3
 
+                #Scores temphum, noise
                 flooroutput[7]= score_functions.temp_hum_score(flooroutput[0],flooroutput[1])
                 flooroutput[8]= score_functions.noise_score(flooroutput[3], flooroutput[4], flooroutput[5], flooroutput[6])
 
