@@ -4,7 +4,7 @@ import sys, os
 
 from Hardware.library_gen import Library
 
-sample_time = 4
+sample_time = 1800
 delta = datetime.timedelta(0, sample_time)
 date = datetime.datetime(2022, 6, 13, 9, 59, 50)
 
@@ -29,9 +29,9 @@ while True:
     m = date.minute
 
 
-    Giuri.generate_values(h, m)
-    dief.generate_values(h,m)
-    BSI.generate_values(h,m)
+    Giuri.generate_values(h, m, date)
+    dief.generate_values(h,m, date)
+    BSI.generate_values(h,m, date)
 
     sys.stdout=open(os.devnull, 'w')
 

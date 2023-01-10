@@ -3,7 +3,13 @@ import time
 import datetime
 import score_functions
 from Hardware.room_gen import Room
+import pymongo
+from pymongo import MongoClient
 
+#Connessione MongoDB
+client = MongoClient("mongodb://localhost:27017")
+db = client.IoT_prova
+db_biblioteche = db.Biblioteche
 
 class Library():
 
@@ -89,7 +95,7 @@ class Library():
         self.mu_test = mu
         return entrance 
     
-    def generate_values(self, h, m):
+    def generate_values(self, h, m, date):
         h = int(str(h))
         m = int(str(m))
         
@@ -126,7 +132,20 @@ class Library():
                 flooroutput[9]= self.output[9]  
 
                 print(self.name[0:3], self.floors[i].name[0:4], flooroutput)
+                place = self.max_places - self.occ_places
+                
                 #print(flooroutput[2])
+                registrati = {'biblioteca': self.name, 'stanza': self.floors[i].name,
+                    'temperature': flooroutput[0],
+                    'humidity': flooroutput[1],
+                    'overal_ambiente': flooroutput[7],
+                    'decibel': flooroutput[8],
+                    'date': date,
+                    'place': place,
+                    'max_place': self.max_places,
+                    'avaible': True}
+
+                db_biblioteche.insert_one(registrati)
 
             self.output[9] = self.output[9] + 1                 
             #print('\n')
