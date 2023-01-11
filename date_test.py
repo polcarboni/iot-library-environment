@@ -24,22 +24,23 @@ i = 0
 while True: 
 
     #Genera dato biblioteca (passa orario)
-    print('\n', date, '\n')
     h = date.hour
     m = date.minute
+    weekday = date.weekday()
+    print('\n', date, ' ', weekday, '\n')
 
 
     Giuri.generate_values(h, m, date)
     dief.generate_values(h,m, date)
     BSI.generate_values(h,m, date)
 
-    sys.stdout=open(os.devnull, 'w')
+    #sys.stdout=open(os.devnull, 'w')
 
     date = date + delta
     i = i + 1 
 
-    if i%200 == 0:
-        sys.stdout = sys.__stdout__
+    #if i%200 == 0:
+    #    sys.stdout = sys.__stdout__
         
 #    time.sleep(2)
 

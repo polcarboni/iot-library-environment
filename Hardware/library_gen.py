@@ -77,7 +77,7 @@ class Library():
 
         r = round(random.gauss(mu, 0.3),2)
 
-
+        '''
         if self.occ_places <= self.max_places and self.occ_places >= 0:
             if r > 0.8:
                 entrance = 1
@@ -89,10 +89,37 @@ class Library():
                 
         elif self.occ_places == 0 and entrance == -1:
                 entrance = 0
-        
+        '''
+        r2 = abs(r)
+
+        if r2>0.05:
+            entrance = entrance + 3
+            if r2>0.2:
+                entrance = entrance + 2
+                if r2>0.4:
+                    entrance = entrance + 3
+                    if r2>0.5:
+                        entrance = entrance + 2
+                        if r2>0.6:
+                            entrance = entrance + 3
+                            if r2>0.7:
+                                entrance = entrance + 2
+                                if r2>0.8:
+                                    entrance = entrance + 3
+                                    if r2>1:
+                                        entrance = entrance + 2
+
+        if r <0:
+            entrance = -entrance
+
         self.occ_places = self.occ_places + entrance
 
-        self.mu_test = mu
+        if self.occ_places > self.max_places:
+            self.occ_places = self.max_places
+        if self.occ_places <0:
+            self.occ_places = 0
+
+        self.mu_test = r
         return entrance 
     
     def generate_values(self, h, m, date):
@@ -143,7 +170,8 @@ class Library():
                     'date': date,
                     'place': place,
                     'max_place': self.max_places,
-                    'avaible': True}
+                    'avaible': True,
+                    'weekday': date.weekday()}
 
                 db_biblioteche.insert_one(registrati)
 
