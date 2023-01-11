@@ -13,13 +13,15 @@ db_biblioteche = db.Biblioteche
 
 class Library():
 
-    def __init__(self, name, floornames, avg_temp, avg_hum, max_places = 100, opening = 9, open_min = 0, closing = 20, closing_min = 0):
+    def __init__(self, name, floornames, avg_temp, avg_hum, long, lat, max_places = 100, opening = 9, open_min = 0, closing = 20, closing_min = 0):
         #temp, hum, entrance, s0, s1, s2, s3, temphumscore, noisescore, progr
         self.name = name
         self.floornames = floornames
         self.output = [0,0,0,0,0,0,0,0,0,0]
         self.max_places = max_places
         self.occ_places = 0
+        self.long = long
+        self.lat = lat
 
         self.opening = opening
         self.closing = closing
@@ -171,7 +173,9 @@ class Library():
                     'place': place,
                     'max_place': self.max_places,
                     'avaible': True,
-                    'weekday': date.weekday()}
+                    'weekday': date.weekday(),
+                    'lat': self.lat,
+                    'long': self.long}
 
                 db_biblioteche.insert_one(registrati)
 

@@ -64,8 +64,8 @@ def opzioni(chat_id, biblioteca):
 
 # Funzione per restituire le info di una biblioteca all'ora in cui si cerca
 def info(chat_id, biblioteca):
-    query = {"biblioteca": {"$regex": biblioteca}, "stanza": {"$regex": "piano_0"}}
-    result = db_biblioteche.find_one(query, {"_id":0, "temperature": 1, "humidity": 1, "decibel": 1, "place": 1, "avaible": 1}, sort=[("_id", pymongo.DESCENDING)])
+    query = {"biblioteca": {"$regex": biblioteca}, "stanza": {"$regex": "ingresso"}}
+    result = db_biblioteche.find_one(query, {"_id":0, "temperature": 1, "humidity": 1, "decibel": 1, "place": 1}, sort=[("_id", pymongo.DESCENDING)])
     print(result)
     output = ""
     emoji = ["\U0001F534", "\U0001F534", "\U0001F7E1", "\U0001F7E1"] #Temp, Hum, Dec, Place
@@ -93,9 +93,148 @@ def tel_send_message(chat_id):
     r = requests.post(url,json=payload)
     return r
 
+# Funzione per trovare la biblioteca migliore
+def portami(chat_id):
+    biblioteche = []
+    out = ""
+    for testy in db_biblioteche.find().distinct('biblioteca'):
+        biblioteche.append(testy)
+
+    best = {"biblioteca": None, "overal_ambiente": -3, "decibel": 0, "place": None}
+    for testy in biblioteche:
+        query = {"biblioteca": {"$regex": testy}, "stanza": {"$regex": "ingresso"}}
+        result = db_biblioteche.find_one(query, {"_id":0, "biblioteca": 1, "overal_ambiente": 1, "decibel": 1, "place": 1}, sort=[("_id", pymongo.DESCENDING)])
+        print(result)
+        abs_amb_re = abs(result['overal_ambiente'])
+        abs_amb_be = abs(best['overal_ambiente'])
+        if abs_amb_re < abs_amb_be and result['decibel'] > best['decibel'] and result["place"]:
+            for key, value in result.items():
+                best[key] = result[key]
+        
+    out = out + "*Biblioteca: " + best["biblioteca"] + "*\n\n"
+    out = out + "Temperatura: "
+
+    if best["overal_ambiente"] == -2:
+        out = out + "Freddissima \U0001F976 \n"
+    elif best["overal_ambiente"] == -1:
+        out = out + "Fredda \U0001F914 \n"
+    elif best["overal_ambiente"] == 0:
+        out = out + "Perfetta \U0001F917 \n"
+    elif best["overal_ambiente"] == 1:
+        out = out + "Calda \U0001F914 \n"
+    elif best["overal_ambiente"] == 2:
+        out = out + "Caldissima \U0001F975 \n"
+
+    out = out + "Rumore: "
+    if best["decibel"] >=0 and best["decibel"] <= 3:
+        out = out + "Rumorosissima \U0001FAE3 \n"
+    elif best["decibel"] >=4 and best["decibel"] <= 5:
+        out = out + "Rumorosa \U0001FAE2 \n"
+    elif best["decibel"] >=6 and best["decibel"] <= 8:
+        out = out + "Silenziosa \U0001F92B \n"
+    elif best["decibel"] >=9 and best["decibel"] <= 10:
+        out = out + "Perfetta \U0001FAE1 \n"
+
+    out = out + "Posti disponibili: " + str(best["place"]) + "\n"
+
+    
+
+    url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
+    payload = {
+                'chat_id': chat_id,
+                'text': out,
+                'parse_mode': 'Markdown'
+            }
+   
+    r = requests.post(url,json=payload)
+    return r, best["biblioteca"]
+
+#Funzione per vedere la mappa
+def mappa(chat_id, biblioteca):
+    
+    query = {"biblioteca": {"$regex": biblioteca}, "stanza": {"$regex": "ingresso"}}
+    result = db_biblioteche.find_one(query, {"_id":0, "lat": 1, "long": 1}, sort=[("_id", pymongo.DESCENDING)])
+
+    url = f'https://api.telegram.org/bot{TOKEN}/sendLocation'
+    payload = {
+                'chat_id': chat_id,
+                'longitude': result['lat'],
+                'latitude': result['long']
+            }
+
+    r = requests.post(url,json=payload)
+    return r
+
+#Stampa giorni della settimana
+def giorni(chat_id):
+
+    out = "/lunedi\n/martedi\n/mercoledi\n/giovedi\n/venerdi\n/sabato"
+
+    url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
+    payload = {
+                'chat_id': chat_id,
+                'text': out
+            }
+
+    r = requests.post(url, json=payload)
+    return r
+
+#Predizione della settimana
+def predizione(chat_id, weekday):
+    biblioteche = []
+    out = ""
+    for testy in db_biblioteche.find().distinct('biblioteca'):
+        biblioteche.append(testy)
+
+    best = {"biblioteca": None, "overal_ambiente": -3, "decibel": 0, "weekday": None}
+    for testy in biblioteche:
+        query = {"biblioteca": {"$regex": testy}, "stanza": {"$regex": "ingresso"}, "weekday": weekday}
+        result = db_biblioteche.find_one(query, {"_id":0, "biblioteca": 1, "overal_ambiente": 1, "decibel": 1, "weekday": 1}, sort=[("_id", pymongo.DESCENDING)])
+        print(result)
+        abs_amb_re = abs(result['overal_ambiente'])
+        abs_amb_be = abs(best['overal_ambiente'])
+        if abs_amb_re < abs_amb_be and result['decibel'] > best['decibel']:
+            for key, value in result.items():
+                best[key] = result[key]
+        
+    out = out + "*Biblioteca: " + best["biblioteca"] + "*\n\n"
+    out = out + "Temperatura: "
+
+    if best["overal_ambiente"] == -2:
+        out = out + "Freddissima \U0001F976 \n"
+    elif best["overal_ambiente"] == -1:
+        out = out + "Fredda \U0001F914 \n"
+    elif best["overal_ambiente"] == 0:
+        out = out + "Perfetta \U0001F917 \n"
+    elif best["overal_ambiente"] == 1:
+        out = out + "Calda \U0001F914 \n"
+    elif best["overal_ambiente"] == 2:
+        out = out + "Caldissima \U0001F975 \n"
+
+    out = out + "Rumore: "
+    if best["decibel"] >=0 and best["decibel"] <= 3:
+        out = out + "Rumorosissima \U0001FAE3 \n"
+    elif best["decibel"] >=4 and best["decibel"] <= 5:
+        out = out + "Rumorosa \U0001FAE2 \n"
+    elif best["decibel"] >=6 and best["decibel"] <= 8:
+        out = out + "Silenziosa \U0001F92B \n"
+    elif best["decibel"] >=9 and best["decibel"] <= 10:
+        out = out + "Perfetta \U0001FAE1 \n"
+
+    url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
+    payload = {
+                'chat_id': chat_id,
+                'text': out,
+                'parse_mode': 'Markdown'
+            }
+   
+    r = requests.post(url,json=payload)
+    return r
+
 @app.route('/', methods = ['GET', 'POST'])
 def index():
     biblioteche = db_biblioteche.distinct("biblioteca")
+    weekday = ["/lunedi", "/martedi", "/mercoledi", "/giovedi", "/venerdi", "/sabato"]
     if request.method == 'POST':
         msg = request.get_json()
 
@@ -106,6 +245,15 @@ def index():
             r = opzioni(chat_id, txt[1:])
         elif txt[:5] == "/Info":
             info(chat_id, txt[6:])
+        elif txt[:10] == "/Posizione":
+            mappa(chat_id, txt[11:])
+        elif txt == "/portami":
+            r, biblioteca = portami(chat_id)
+            mappa(chat_id, biblioteca)
+        elif txt == "/giorni":
+            giorni(chat_id)
+        elif txt in weekday:
+            predizione(chat_id, weekday.index(txt))
         else:
             tel_send_message(chat_id)
 
